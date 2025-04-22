@@ -39,7 +39,7 @@
 /* 暗色模式基础变量 */
 [data-theme="dark"] {
     --bg-primary: #1a2330;
-    --bg-secondary: #26303f;
+    --bg-secondary: #526d9655;
     --text-primary: #e6ebf0;
     --text-secondary: #a7b6c7;
     --form-bg: #26303f;
@@ -237,21 +237,45 @@
     --quote-color: rgba(29, 77, 114, 0.7);
 }
 
-/* 主题控制区域容器 - 需要修改 */
+/* 自适应扩展的主题控制容器 */
 .theme-controls {
     position: absolute;
     top: 35vh;
     right: 20px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 20px; /* 增加间距 */
+    align-items: center;
+    gap: 20px;
     z-index: 100;
+    
+    /* 高通透轻磨砂效果 */
+    padding: 15px 10px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    
+    /* 关键：添加过渡效果 */
+    transition: all 0.3s ease, padding 0.3s ease;
 }
 
-/* 颜色主题选择器 - 下拉式 */
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .theme-controls {
+        background: rgba(20, 20, 20, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+}
+
+/* 颜色主题选择器容器 */
 .color-theme-dropdown {
     position: relative;
+    /* 确保整个下拉区域都在容器内 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* 当前主题按钮 */
@@ -272,34 +296,44 @@
 }
 
 .current-theme:hover {
-    transform: scale(1.1);
+    transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--form-shadow);
 }
 
-/* 颜色选项下拉菜单 */
+
+/* 颜色选项菜单 - 改为容器内相对定位而非绝对定位 */
 .color-options {
-    position: absolute;
-    top: calc(100% + 5px); /* 保持在按钮下方 */
-    left: 50%; /* 水平居中的关键 */
-    transform: translateX(-50%); /* 配合left:50%实现真正的水平居中 */
-    background-color: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* 保持单列布局 */
     gap: 8px;
+    padding: 8px;
+    background: transparent; /* 不需要额外背景 */
+    box-shadow: none; /* 移除阴影 */
+    border-radius: 0;
+    
+    /* 关键：初始状态为高度为0，隐藏内容 */
+    max-height: 0;
     opacity: 0;
+    overflow: hidden;
     visibility: hidden;
     transition: all 0.3s ease;
-    z-index: 4;
+    
+    /* 确保不影响布局 */
+    margin: 0;
+    width: 100%;
 }
 
-/* 下拉菜单悬停时显示 */
+/* 悬停时展开菜单 */
 .color-theme-dropdown:hover .color-options {
+    max-height: 300px; /* 足够大以显示所有选项 */
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0); /* 同时保持水平居中和垂直过渡 */
+    margin-top: 8px; /* 添加一些间距 */
+}
+
+/* 当悬停时，增加容器底部空间以容纳展开的菜单 */
+.theme-controls:has(.color-theme-dropdown:hover) {
+    padding-bottom: 25px; /* 当菜单展开时，增加底部内边距 */
 }
 
 /* 颜色选项 */
