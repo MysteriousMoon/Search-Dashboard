@@ -305,6 +305,14 @@
     box-shadow: 0 4px 12px var(--form-shadow);
 }
 
+.dropdown-separator {
+    height: 1px;
+    background-color: #e0e0e0be; /* 浅灰色分隔线，可以根据主题调整颜色 */
+    margin: 5px 0;             /* 上下边距 */
+    width: 90%;                /* 宽度稍小于容器宽度 */
+    margin-left: auto;
+    margin-right: auto;        /* 居中显示 */
+}
 
 /* 颜色选项菜单 - 改为容器内相对定位而非绝对定位 */
 .color-options {
@@ -840,8 +848,10 @@ form:hover svg {
         <div class="color-theme-dropdown" id="colorThemeDropdown">
             <!-- 当前颜色主题显示 -->
             <div class="current-theme" id="currentTheme"></div>
-        <!-- 颜色选项下拉菜单 - 按色轮顺序排列 -->
+            <!-- 颜色选项下拉菜单 - 按色轮顺序排列 -->
             <div class="color-options">
+                <!-- 添加分隔线 -->
+                <div class="dropdown-separator"></div>
                 <div class="color-option" data-color="sunset" title="日落主题"></div>
                 <div class="color-option" data-color="zimojin" title="紫磨金主辉题"></div>
                 <div class="color-option" data-color="taoyao" title="桃夭春晓主题"></div>
