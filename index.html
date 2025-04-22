@@ -2,155 +2,525 @@
 <html lang="en">
 <head>
     <title>Search</title>
-	<meta charset="utf-8" />
-	<style>
-        body {
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            /* Light theme - based on traditional 青鸾/菘蓝 aesthetics */
+            --bg-primary: #f5f9fc;
+            --bg-secondary: #e9eff4;
+            --text-primary: #333840;
+            --text-secondary: #5d6b7b;
+            
+            /* Songlan colors converted from CMYK values */
+            --songlan-light: rgb(141, 165, 177); /* C45 M30 Y25 K0 */
+            --songlan-deep: rgb(89, 114, 143);   /* C65 M50 Y35 K0 */
+            
+            /* Eagle-to-pigeon transformation colors */
+            --eagle-start: rgb(154, 167, 177);   /* 鹰化为鸠之起色 */
+            --eagle-continue: rgb(107, 121, 142); /* 鹰化为鸠之承色 */
+            
+            /* UI Elements */
+            --form-bg: white;
+            --form-border: rgba(107, 121, 142, 0.2);
+            --form-shadow: rgba(89, 114, 143, 0.08);
+            --button-bg: var(--songlan-deep);
+            --button-hover: rgb(69, 94, 123);
+            --icon-color: rgb(107, 121, 142);
+            --title-gradient-start: var(--songlan-deep);
+            --title-gradient-end: rgb(69, 94, 123);
+            --focus-ring: rgba(89, 114, 143, 0.25);
+            --quote-color: rgba(89, 114, 143, 0.7);
+            --quote-shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Dark theme */
+        [data-theme="dark"] {
+            --bg-primary: #1a2330;
+            --bg-secondary: #26303f;
+            --text-primary: #e6ebf0;
+            --text-secondary: #a7b6c7;
+            
+            /* Adjusted for dark theme */
+            --songlan-light: rgb(111, 135, 147);
+            --songlan-deep: rgb(99, 124, 153);
+            
+            --eagle-start: rgb(134, 147, 157);
+            --eagle-continue: rgb(117, 131, 152);
+            
+            --form-bg: #26303f;
+            --form-border: rgba(127, 141, 162, 0.3);
+            --form-shadow: rgba(0, 0, 0, 0.25);
+            --button-bg: rgb(89, 114, 143);
+            --button-hover: rgb(109, 134, 163);
+            --icon-color: rgb(147, 161, 182);
+            --title-gradient-start: rgb(89, 114, 143);
+            --title-gradient-end: rgb(109, 134, 163);
+            --focus-ring: rgba(129, 154, 183, 0.4);
+            --quote-color: rgba(159, 184, 213, 0.7);
+            --quote-shadow: rgba(0, 0, 0, 0.15);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: 'Noto Serif SC';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/notoserifsc/v22/H4chBXePl9DZ0Xe7gG9cyOj7oqP7.otf) format('opentype');
+        }
+
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center; /* 垂直居中 */
-            flex-direction: column; /* 设置为竖直方向 */
-            height: 100vh; /* 占满整个视口高度 */
-            background-color: rgba(0, 0, 0, 0.6);
-            font-family: Arial, sans-serif; /* 默认字体 */
+            overflow: hidden; /* Prevent scrollbars */
         }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 80% 20%, var(--songlan-light), transparent 40%),
+                radial-gradient(circle at 20% 80%, var(--eagle-start), transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: all 0.4s ease;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 25px;
+            background: var(--bg-secondary);
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            justify-content: flex-start;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            justify-content: flex-end;
+        }
+
+        .theme-toggle .indicator {
+            width: 18px;
+            height: 18px;
+            background: var(--button-bg);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
         .container {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* 表单之间的间距 */
+            gap: 14px;
             width: 100%;
-            max-width: 450px;
+            max-width: 520px;
+            padding: 22px;
+            margin: 0;
+            background-color: var(--bg-secondary);
+            background-image: 
+                linear-gradient(120deg, transparent, var(--bg-secondary), rgba(141, 165, 177, 0.1));
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s ease;
+            max-height: 90vh; /* Limit height to prevent overflow */
+            overflow-y: auto; /* Add scrollbar only if needed inside container */
+            position: relative;
         }
-		.title {
-            font-size: 24px; /* 标题文字大小 */
-            font-weight: bold; /* 加粗 */
-            color: lightblue; /* 蓝色字体 */
-            text-align: center; /* 居中对齐 */
-            padding: 10px 20px; /* 内边距 */
-            margin-bottom: 20px; /* 与其他内容的间距 */
-            background: linear-gradient(90deg, #007bff, rgb(49, 98, 223)); /* 渐变背景 */
-            border-radius: 10px; /* 圆角边框 */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影 */
-            text-transform: uppercase; /* 全部大写 */
-			box-shadow: 0 0 10px rgb(107, 165, 149);
+
+        /* Quote decoration in background */
+        .container::before {
+            content: ""青取之于蓝，而青于蓝"";
+            position: absolute;
+            bottom: 12px;
+            right: 18px;
+            font-size: 14px;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--quote-color);
+            opacity: 0.5;
+            text-shadow: 0 1px 1px var(--quote-shadow);
+            pointer-events: none;
+            z-index: 0;
         }
-		.title:hover{
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 悬停时的阴影效果 */
-			border-color: rgb(57, 114, 236);
-			box-shadow: 0 0 20px rgb(119, 214, 187);
-			transform: scale(1.02)
-		}
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            padding: 16px 25px;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--title-gradient-start), var(--title-gradient-end));
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        /* Phoenix decoration for title */
+        .title::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' opacity='0.15'%3E%3Cpath d='M30,20 Q45,10 60,20 T90,40 Q70,50 90,60 T60,80 Q45,90 30,80 T10,60 Q30,50 10,40 T30,20 Z' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            background-size: contain;
+            opacity: 0.15;
+        }
+
+        .title:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .quote-subtle {
+            margin: -10px 0 8px;
+            text-align: center;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-subtle::before,
+        .quote-subtle::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 1px;
+            background: var(--text-secondary);
+            opacity: 0.3;
+            position: relative;
+            top: -4px;
+            margin: 0 8px;
+        }
+
         form {
             display: flex;
             flex-direction: row;
             align-items: center;
-            border: 2px solid #ccc; /* 边框 */
-            border-radius: 1rem; /* 圆角 */
-            background: #ffffff; /* 背景色 */
-            padding: 8px 12px; /* 内边距 */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-			transition: transform 0.3s ease, background-color 0.3s ease; /* 添加放大和平滑过渡效果 */
+            gap: 12px;
+            border: 1px solid var(--form-border);
+            border-radius: 10px;
+            background: var(--form-bg);
+            padding: 10px 14px;
+            box-shadow: 0 2px 6px var(--form-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
-		form:hover{
-			transform: scale(1.04);
-			border-color: aqua;
-		}
-		form:active{
-			transform: scale(1.04); /* 悬停时放大 10% */
-		}
-		form:focus-within {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 悬停时的阴影效果 */
-			border-color: rgb(57, 114, 236);
-			box-shadow: 0 0 10px rgb(107, 165, 149);
-			transform: scale(1.02)
+
+        /* Traditional pattern overlay on form */
+        form::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' opacity='0.03'%3E%3Cpath d='M10,2 L18,10 L10,18 L2,10 L10,2 Z' fill='%23597290'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
         }
+
+        form:hover {
+            border-color: var(--songlan-light);
+            box-shadow: 0 4px 12px var(--form-shadow);
+            transform: translateY(-1px);
+        }
+
+        form:focus-within {
+            border-color: var(--songlan-deep);
+            box-shadow: 0 0 0 3px var(--focus-ring), 0 4px 12px var(--form-shadow);
+        }
+
         input[type="search"] {
             flex-grow: 1;
             border: none;
             outline: none;
             font-size: 16px;
-            padding: 8px;
+            padding: 8px 0;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: inherit;
+            caret-color: var(--songlan-deep);
         }
-        /* 百度知乎隐藏 */
-        input[name="wd"] {
-            color: transparent; /* 隐藏文字颜色 */
-            caret-color: black; /* 光标仍然可见 */
+
+        /* For Zhihu search placeholder */
+        form.ZhiHu input[name="q"] {
+            color: var(--text-secondary);
         }
-        input[name="wd"]:focus {
-            color: black; /* 输入时显示用户输入内容 */
+        
+        form.ZhiHu input[name="q"]:focus {
+            color: var(--text-primary);
         }
-		button {
-			background-color: #007bff; /* 按钮背景色 */
-			color: #ffffff; /* 按钮字体颜色 */
-			border: none;
-			border-radius: 5px;
-			padding: 8px 12px;
-			cursor: pointer;
-			font-size: 14px;
-		}
-		button:hover {
-			background-color: #0056b3; /* 悬停时的按钮背景色 */
-		}
-		button:active {
-			background-color: #00408b; /* 点击时的按钮背景色 */
-		}
-        svg{
-            width: 25px;
-            height: 25px;
+
+        input[type="search"]::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.6s;
+            pointer-events: none;
+        }
+
+        button:active::after {
+            transform: scale(20);
+            opacity: 0;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
             display: block;
+            flex-shrink: 0;
+            color: var(--icon-color);
+            transition: color 0.3s ease;
         }
-        @media (max-width: 500px) {
+
+        form:hover svg {
+            color: var(--songlan-deep);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
             .container {
-                padding: 0 10px;
+                padding: 16px;
+                gap: 12px;
+                max-width: 95%;
+                max-height: 85vh;
             }
-            button {
+            .title {
+                font-size: 22px;
+                padding: 12px 18px;
+                margin-bottom: 12px;
+            }
+            .quote-subtle {
                 font-size: 12px;
-                padding: 6px 10px;
+                margin: -8px 0 5px;
+            }
+            .quote-subtle::before,
+            .quote-subtle::after {
+                width: 20px;
+                margin: 0 5px;
+            }
+            .container::before {
+                font-size: 12px;
+                bottom: 8px;
+                right: 12px;
+            }
+            form {
+                padding: 8px 12px;
+                gap: 8px;
             }
             input[type="search"] {
-                font-size: 14px;
+                font-size: 15px;
+            }
+            button {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+            svg {
+                width: 18px;
+                height: 18px;
+            }
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 22px;
+            }
+            .theme-toggle .indicator {
+                width: 16px;
+                height: 16px;
             }
         }
-	</style>
+
+        /* For very small screens */
+        @media (max-height: 600px) {
+            .container {
+                gap: 10px;
+                padding: 12px;
+            }
+            .title {
+                font-size: 20px;
+                padding: 10px 15px;
+                margin-bottom: 10px;
+            }
+            .quote-subtle {
+                margin: -5px 0 2px;
+            }
+            form {
+                padding: 6px 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div class="title">Aggregated Search Page</div>
-	<div class="container">
-    <form class ="Google" action="https://www.google.com/search" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M15.5475 8.30327C14.6407 7.49361 13.4329 7 12.1089 7C9.28696 7 7 9.23899 7 12C7 14.761 9.28696 17 12.1089 17C15.5781 17 16.86 14.4296 17 12.4167H12.841" stroke="#000000" stroke-width="1.5"></path><path d="M21 8V16C21 18.7614 18.7614 21 16 21H8C5.23858 21 3 18.7614 3 16V8C3 5.23858 5.23858 3 8 3H16C18.7614 3 21 5.23858 21 8Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-        <input autocomplete="off" name="q" type="search" tabindex="1">
-        <button>Google Search</button>
-    </form>
-    <form class="Bilibili" action="https://search.bilibili.com/video" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M6 8.5V12M6 15.5V12M6 12H10.5M10.5 12L10.5 8.5M10.5 12L10.5 15.5" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14 12V8.5C16.5 8.5 19 8.5 19 12C19 15.5 16.5 15.5 14 15.5V12Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1 15V9C1 5.68629 3.68629 3 7 3H17C20.3137 3 23 5.68629 23 9V15C23 18.3137 20.3137 21 17 21H7C3.68629 21 1 18.3137 1 15Z" stroke="#000000" stroke-width="1.5"></path></svg>
-        <input autocomplete="off" name="keyword" type="search" tabindex="2">
-        <button type="submit">Search Bilibili</button>
-    </form>
-	<form class="YouTube" action="https://www.youtube.com/results" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M14 12L10.5 14V10L14 12Z" fill="#000000" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2 12.7075V11.2924C2 8.39705 2 6.94939 2.90549 6.01792C3.81099 5.08645 5.23656 5.04613 8.08769 4.96549C9.43873 4.92728 10.8188 4.8999 12 4.8999C13.1812 4.8999 14.5613 4.92728 15.9123 4.96549C18.7634 5.04613 20.189 5.08645 21.0945 6.01792C22 6.94939 22 8.39705 22 11.2924V12.7075C22 15.6028 22 17.0505 21.0945 17.9819C20.189 18.9134 18.7635 18.9537 15.9124 19.0344C14.5613 19.0726 13.1812 19.1 12 19.1C10.8188 19.1 9.43867 19.0726 8.0876 19.0344C5.23651 18.9537 3.81097 18.9134 2.90548 17.9819C2 17.0505 2 15.6028 2 12.7075Z" stroke="#000000" stroke-width="1.5"></path></svg>
-        <input autocomplete="off" name="search_query" type="search" tabindex="3">
-        <button type="submit">Search YouTube</button>
-    </form>
-    <form class="ZhiHu" action="https://www.baidu.com/s" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M4 21.4V2.6C4 2.26863 4.26863 2 4.6 2H16.2515C16.4106 2 16.5632 2.06321 16.6757 2.17574L19.8243 5.32426C19.9368 5.43679 20 5.5894 20 5.74853V21.4C20 21.7314 19.7314 22 19.4 22H4.6C4.26863 22 4 21.7314 4 21.4Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 10L16 10" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 18L16 18" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 14L12 14" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 2V5.4C16 5.73137 16.2686 6 16.6 6H20" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-        <input autocomplete="off" name="wd" type="search" value="site:zhihu.com " tabndex="4">
-        <button>Search Zhihu</button>
-    </form>
-	<form class="zlibrary" action="https://zh.1lib.sk/s/" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" stroke-width="1.5" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M4 19V5C4 3.89543 4.89543 3 6 3H19.4C19.7314 3 20 3.26863 20 3.6V16.7143" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path><path d="M8 3V11L10.5 9.4L13 11V3" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6 17L20 17" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path><path d="M6 21L20 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path><path d="M6 21C4.89543 21 4 20.1046 4 19C4 17.8954 4.89543 17 6 17" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-		<input autocomplete="off" name="q" type="search" tabindex="5">
-		<button>Search Zlibrary</button>
-	</form>
-	<form class="Wikipedia" action="https://zh.wikipedia.org/wiki/Special:Search" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 12.5L8 14.5L7 18L8 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 20.5L16.5 18L14 17V13.5L17 12.5L21.5 13" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5.5L18.5 7L15 7.5V10.5L17.5 9.5H19.5L21.5 10.5" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 10.5L5 8.5L7.5 8L9.5 5L8.5 3" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-        <input autocomplete="off" name="search" type="search" tabindex="6">
-        <button>Search Wikipedia (CN)</button>
-    </form>
-	<form class="Wikipedia" action="https://en.wikipedia.org/wiki/Special:Search" method="get">
-        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 12.5L8 14.5L7 18L8 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 20.5L16.5 18L14 17V13.5L17 12.5L21.5 13" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5.5L18.5 7L15 7.5V10.5L17.5 9.5H19.5L21.5 10.5" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 10.5L5 8.5L7.5 8L9.5 5L8.5 3" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-        <input autocomplete="off" name="search" type="search" tabindex="7">
-        <button>Search Wikipedia (EN)</button>
-    </form>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <div class="indicator"></div>
+    </div>
+
+    <div class="container">
+        <div class="title">聚合搜索</div>
+        <div class="quote-subtle">青取之于蓝，而青于蓝</div>
+
+        <!-- Google Search -->
+        <form class="Google" action="https://www.google.com/search" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M15.5475 8.30327C14.6407 7.49361 13.4329 7 12.1089 7C9.28696 7 7 9.23899 7 12C7 14.761 9.28696 17 12.1089 17C15.5781 17 16.86 14.4296 17 12.4167H12.841" stroke="currentColor" stroke-width="1.5"></path><path d="M21 8V16C21 18.7614 18.7614 21 16 21H8C5.23858 21 3 18.7614 3 16V8C3 5.23858 5.23858 3 8 3H16C18.7614 3 21 5.23858 21 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="Google 搜索" tabindex="2">
+            <button type="submit">Google</button>
+        </form>
+
+        <!-- Bilibili Search -->
+        <form class="Bilibili" action="https://search.bilibili.com/video" method="get">
+            <svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M6 8.5V12M6 15.5V12M6 12H10.5M10.5 12L10.5 8.5M10.5 12L10.5 15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14 12V8.5C16.5 8.5 19 8.5 19 12C19 15.5 16.5 15.5 14 15.5V12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1 15V9C1 5.68629 3.68629 3 7 3H17C20.3137 3 23 5.68629 23 9V15C23 18.3137 20.3137 21 17 21H7C3.68629 21 1 18.3137 1 15Z" stroke="currentColor" stroke-width="1.5"></path></svg>
+            <input autocomplete="off" name="keyword" type="search" placeholder="哔哩哔哩搜索" tabindex="3">
+            <button type="submit">哔哩哔哩</button>
+        </form>
+
+        <!-- YouTube Search -->
+        <form class="YouTube" action="https://www.youtube.com/results" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M14 12L10.5 14V10L14 12Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2 12.7075V11.2924C2 8.39705 2 6.94939 2.90549 6.01792C3.81099 5.08645 5.23656 5.04613 8.08769 4.96549C9.43873 4.92728 10.8188 4.8999 12 4.8999C13.1812 4.8999 14.5613 4.92728 15.9123 4.96549C18.7634 5.04613 20.189 5.08645 21.0945 6.01792C22 6.94939 22 8.39705 22 11.2924V12.7075C22 15.6028 22 17.0505 21.0945 17.9819C20.189 18.9134 18.7635 18.9537 15.9124 19.0344C14.5613 19.0726 13.1812 19.1 12 19.1C10.8188 19.1 9.43867 19.0726 8.0876 19.0344C5.23651 18.9537 3.81097 18.9134 2.90548 17.9819C2 17.0505 2 15.6028 2 12.7075Z" stroke="currentColor" stroke-width="1.5"></path></svg>
+            <input autocomplete="off" name="search_query" type="search" placeholder="YouTube 搜索" tabindex="4">
+            <button type="submit">YouTube</button>
+        </form>
+
+        <!-- ChatGPT Search -->
+        <form class="ChatGPT" action="https://chatgpt.com/" method="get">
+            <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 509.639"><path fill="currentColor" d="M115.612 0h280.775C459.974 0 512 52.026 512 115.612v278.415c0 63.587-52.026 115.613-115.613 115.613H115.612C52.026 509.64 0 457.614 0 394.027V115.612C0 52.026 52.026 0 115.612 0z" opacity="0.1"/><path fill-rule="nonzero" fill="currentColor" d="M412.037 221.764a90.834 90.834 0 004.648-28.67 90.79 90.79 0 00-12.443-45.87c-16.37-28.496-46.738-46.089-79.605-46.089-6.466 0-12.943.683-19.264 2.04a90.765 90.765 0 00-67.881-30.515h-.576c-.059.002-.149.002-.216.002-39.807 0-75.108 25.686-87.346 63.554-25.626 5.239-47.748 21.31-60.682 44.03a91.873 91.873 0 00-12.407 46.077 91.833 91.833 0 0023.694 61.553 90.802 90.802 0 00-4.649 28.67 90.804 90.804 0 0012.442 45.87c16.369 28.504 46.74 46.087 79.61 46.087a91.81 91.81 0 0019.253-2.04 90.783 90.783 0 0067.887 30.516h.576l.234-.001c39.829 0 75.119-25.686 87.357-63.588 25.626-5.242 47.748-21.312 60.682-44.033a91.718 91.718 0 0012.383-46.035 91.83 91.83 0 00-23.693-61.553l-.004-.005zM275.102 413.161h-.094a68.146 68.146 0 01-43.611-15.8 56.936 56.936 0 002.155-1.221l72.54-41.901a11.799 11.799 0 005.962-10.251V241.651l30.661 17.704c.326.163.55.479.596.84v84.693c-.042 37.653-30.554 68.198-68.21 68.273h.001zm-146.689-62.649a68.128 68.128 0 01-9.152-34.085c0-3.904.341-7.817 1.005-11.663.539.323 1.48.897 2.155 1.285l72.54 41.901a11.832 11.832 0 0011.918-.002l88.563-51.137v35.408a1.1 1.1 0 01-.438.94l-73.33 42.339a68.43 68.43 0 01-34.11 9.12 68.359 68.359 0 01-59.15-34.11l-.001.004zm-19.083-158.36a68.044 68.044 0 0135.538-29.934c0 .625-.036 1.731-.036 2.5v83.801l-.001.07a11.79 11.79 0 005.954 10.242l88.564 51.13-30.661 17.704a1.096 1.096 0 01-1.034.093l-73.337-42.375a68.36 68.36 0 01-34.095-59.143 68.412 68.412 0 019.112-34.085l-.004-.003zm251.907 58.621l-88.563-51.137 30.661-17.697a1.097 1.097 0 011.034-.094l73.337 42.339c21.109 12.195 34.132 34.746 34.132 59.132 0 28.604-17.849 54.199-44.686 64.078v-86.308c.004-.032.004-.065.004-.096 0-4.219-2.261-8.119-5.919-10.217zm30.518-45.93c-.539-.331-1.48-.898-2.155-1.286l-72.54-41.901a11.842 11.842 0 00-5.958-1.611c-2.092 0-4.15.558-5.957 1.611l-88.564 51.137v-35.408l-.001-.061a1.1 1.1 0 01.44-.88l73.33-42.303a68.301 68.301 0 0134.108-9.129c37.704 0 68.281 30.577 68.281 68.281a68.69 68.69 0 01-.984 11.545v.005zm-191.843 63.109l-30.668-17.704a1.09 1.09 0 01-.596-.84v-84.692c.016-37.685 30.593-68.236 68.281-68.236a68.332 68.332 0 0143.689 15.804 63.09 63.09 0 00-2.155 1.222l-72.54 41.9a11.794 11.794 0 00-5.961 10.248v.068l-.05 102.23zm16.655-35.91l39.445-22.782 39.444 22.767v45.55l-39.444 22.767-39.445-22.767v-45.535z"/></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="ChatGPT 搜索" tabindex="1">
+            <button type="submit">ChatGPT</button>
+        </form>
+
+        <!-- Zhihu Search - Updated URL -->
+        <form class="ZhiHu" action="https://zhida.zhihu.com/search" method="get">
+            <svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M4 21.4V2.6C4 2.26863 4.26863 2 4.6 2H16.2515C16.4106 2 16.5632 2.06321 16.6757 2.17574L19.8243 5.32426C19.9368 5.43679 20 5.5894 20 5.74853V21.4C20 21.7314 19.7314 22 19.4 22H4.6C4.26863 22 4 21.7314 4 21.4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 10L16 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 18L16 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 14L12 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 2V5.4C16 5.73137 16.2686 6 16.6 6H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="知乎搜索" tabindex="5">
+            <button type="submit">知乎</button>
+        </form>
+
+        <!-- Zlibrary Search -->
+        <form class="zlibrary" action="https://zh.1lib.sk/s/" method="get">
+            <svg width="24px" stroke-width="1.5" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M4 19V5C4 3.89543 4.89543 3 6 3H19.4C19.7314 3 20 3.26863 20 3.6V16.7143" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><path d="M8 3V11L10.5 9.4L13 11V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6 17L20 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><path d="M6 21L20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><path d="M6 21C4.89543 21 4 20.1046 4 19C4 17.8954 4.89543 17 6 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="Z-Library 图书搜索" tabindex="6">
+            <button type="submit">Z-Library</button>
+        </form>
+
+        <!-- Wikipedia CN Search -->
+        <form class="Wikipedia" action="https://zh.wikipedia.org/wiki/Special:Search" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 12.5L8 14.5L7 18L8 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 20.5L16.5 18L14 17V13.5L17 12.5L21.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5.5L18.5 7L15 7.5V10.5L17.5 9.5H19.5L21.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 10.5L5 8.5L7.5 8L9.5 5L8.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="search" type="search" placeholder="维基百科搜索 (中文)" tabindex="7">
+            <button type="submit">维基百科中文</button>
+        </form>
+
+        <!-- Wikipedia EN Search -->
+        <form class="Wikipedia" action="https://en.wikipedia.org/wiki/Special:Search" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 12.5L8 14.5L7 18L8 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 20.5L16.5 18L14 17V13.5L17 12.5L21.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5.5L18.5 7L15 7.5V10.5L17.5 9.5H19.5L21.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 10.5L5 8.5L7.5 8L9.5 5L8.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="search" type="search" placeholder="维基百科搜索 (英文)" tabindex="8">
+            <button type="submit">维基百科英文</button>
+        </form>
+    </div>
+
+    <script>
+        // Theme switcher function
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        // Check for saved theme preference or use system preference
+        function applyTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        }
+        
+        // Apply theme on load
+        applyTheme();
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (!localStorage.getItem('theme')) {
+                document.documentElement.setAttribute('data-theme', event.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
 </body>
 </html>
