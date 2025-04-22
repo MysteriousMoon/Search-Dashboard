@@ -254,8 +254,7 @@
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     
     /* 关键：添加过渡效果 */
     transition: all 0.3s ease, padding 0.3s ease;
@@ -265,7 +264,6 @@
 @media (prefers-color-scheme: dark) {
     .theme-controls {
         background: rgba(20, 20, 20, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.15);
     }
 }
 
@@ -328,12 +326,6 @@
     max-height: 300px; /* 足够大以显示所有选项 */
     opacity: 1;
     visibility: visible;
-    margin-top: 8px; /* 添加一些间距 */
-}
-
-/* 当悬停时，增加容器底部空间以容纳展开的菜单 */
-.theme-controls:has(.color-theme-dropdown:hover) {
-    padding-bottom: 25px; /* 当菜单展开时，增加底部内边距 */
 }
 
 /* 颜色选项 */
@@ -436,7 +428,7 @@
 
 
 .theme-toggle-btn {
-    position: relative; /* 改为相对于theme-controls的相对定位 */
+    position: relative;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -549,7 +541,7 @@ body {
         linear-gradient(120deg, transparent, var(--bg-secondary), rgba(141, 165, 177, 0.1));
     backdrop-filter: blur(10px);
     border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     transition: all 0.4s ease;
     max-height: 90vh; /* Limit height to prevent overflow */
     overflow-y: auto; /* Add scrollbar only if needed inside container */
