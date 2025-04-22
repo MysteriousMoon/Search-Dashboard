@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root {
+         :root {
             /* Light theme - based on traditional 青鸾/菘蓝 aesthetics */
             --bg-primary: #f5f9fc;
             --bg-secondary: #e9eff4;
@@ -422,12 +422,122 @@
                 padding: 6px 10px;
             }
         }
+        
+        /* 主题控制区域容器 */
+.theme-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    z-index: 100;
+}
+
+/* 自动/手动开关容器 */
+.auto-toggle {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px var(--form-shadow);
+    transition: all 0.3s ease;
+}
+
+.auto-toggle span {
+    color: var(--text-secondary);
+    font-size: 13px;
+    transition: color 0.3s ease;
+}
+
+.auto-toggle span:first-child {
+    margin-right: 8px;
+}
+
+.auto-toggle span:last-child {
+    margin-left: 8px;
+}
+
+/* 三模式主题切换按钮 */
+.theme-toggle-btn {
+    position: absolute;
+    top: 10vh; /* 从20px增加到60px，位置更低 */
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-secondary);
+    box-shadow: 0 2px 8px var(--form-shadow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.theme-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--form-shadow);
+}
+
+.toggle-icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.toggle-icon.auto-icon {
+    font-family: sans-serif;
+    font-weight: bold;
+    color: var(--songlan-deep);
+}
+
+.toggle-icon.sun-icon {
+    color: #f39c12;
+}
+
+.toggle-icon.moon-icon {
+    color: #9b59b6;
+}
+
+.toggle-icon.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+    .theme-toggle-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .toggle-icon {
+        font-size: 15px;
+    }
+}
     </style>
 </head>
 <body>
-    <!-- Theme Toggle Switch -->
-    <div class="theme-toggle" onclick="toggleTheme()">
-        <div class="indicator"></div>
+    <!-- 三模式主题切换按钮 -->
+    <div class="theme-toggle-btn" id="themeToggleBtn">
+        <div class="toggle-icon auto-icon active">Auto</div>
+        <div class="toggle-icon sun-icon">☀</div>
+        <div class="toggle-icon moon-icon">🌙</div>
     </div>
 
     <div class="container">
@@ -492,35 +602,134 @@
     </div>
 
     <script>
-        // Theme switcher function
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
+    // 主题切换器
+    const themeToggler = {
+        // DOM 元素
+        elements: {
+            toggleBtn: null,
+            autoIcon: null,
+            sunIcon: null,
+            moonIcon: null
+        },
         
-        // Check for saved theme preference or use system preference
-        function applyTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.setAttribute('data-theme', 'dark');
+        // 主题模式
+        modes: {
+            AUTO: 'auto',
+            LIGHT: 'light',
+            DARK: 'dark'
+        },
+        
+        // 存储键
+        storageKey: 'themeMode',
+        
+        // 当前模式
+        currentMode: 'auto',
+        
+        // 初始化
+        init: function() {
+            // 获取 DOM 元素
+            this.elements.toggleBtn = document.getElementById('themeToggleBtn');
+            this.elements.autoIcon = this.elements.toggleBtn.querySelector('.auto-icon');
+            this.elements.sunIcon = this.elements.toggleBtn.querySelector('.sun-icon');
+            this.elements.moonIcon = this.elements.toggleBtn.querySelector('.moon-icon');
+            
+            // 绑定事件
+            this.elements.toggleBtn.addEventListener('click', () => this.toggleMode());
+            
+            // 加载保存的模式
+            this.loadSavedMode();
+            
+            // 初始应用主题
+            this.applyTheme();
+            
+            // 监听系统主题变化
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (this.currentMode === this.modes.AUTO) {
+                    this.applyTheme();
+                }
+            });
+        },
+        
+        // 加载保存的模式
+        loadSavedMode: function() {
+            const savedMode = localStorage.getItem(this.storageKey);
+            if (savedMode && Object.values(this.modes).includes(savedMode)) {
+                this.currentMode = savedMode;
+                this.updateButtonState();
+            }
+        },
+        
+        // 切换模式
+        toggleMode: function() {
+            // 按顺序切换: auto -> light -> dark -> auto
+            switch (this.currentMode) {
+                case this.modes.AUTO:
+                    this.currentMode = this.modes.LIGHT;
+                    break;
+                case this.modes.LIGHT:
+                    this.currentMode = this.modes.DARK;
+                    break;
+                case this.modes.DARK:
+                    this.currentMode = this.modes.AUTO;
+                    break;
+                default:
+                    this.currentMode = this.modes.AUTO;
+            }
+            
+            // 保存选择
+            localStorage.setItem(this.storageKey, this.currentMode);
+            
+            // 更新按钮状态
+            this.updateButtonState();
+            
+            // 应用主题
+            this.applyTheme();
+        },
+        
+        // 更新按钮显示状态
+        updateButtonState: function() {
+            // 移除所有图标的 active 类
+            this.elements.autoIcon.classList.remove('active');
+            this.elements.sunIcon.classList.remove('active');
+            this.elements.moonIcon.classList.remove('active');
+            
+            // 根据当前模式添加 active 类
+            switch (this.currentMode) {
+                case this.modes.AUTO:
+                    this.elements.autoIcon.classList.add('active');
+                    break;
+                case this.modes.LIGHT:
+                    this.elements.sunIcon.classList.add('active');
+                    break;
+                case this.modes.DARK:
+                    this.elements.moonIcon.classList.add('active');
+                    break;
+            }
+        },
+        
+        // 应用主题
+        applyTheme: function() {
+            let theme;
+            
+            // 根据模式确定主题
+            if (this.currentMode === this.modes.AUTO) {
+                // 自动模式下跟随系统设置
+                const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                theme = prefersDarkMode ? 'dark' : 'light';
             } else {
-                document.documentElement.setAttribute('data-theme', 'light');
+                // 手动模式使用选定的主题
+                theme = this.currentMode;
             }
+            
+            // 应用主题到文档
+            document.documentElement.setAttribute('data-theme', theme);
         }
-        
-        // Apply theme on load
-        applyTheme();
-        
-        // Listen for system theme changes
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (!localStorage.getItem('theme')) {
-                document.documentElement.setAttribute('data-theme', event.matches ? 'dark' : 'light');
-            }
-        });
+    };
+
+    // 文档加载完成后初始化主题切换器
+    document.addEventListener('DOMContentLoaded', () => {
+        themeToggler.init();
+    });
     </script>
 </body>
 </html>
