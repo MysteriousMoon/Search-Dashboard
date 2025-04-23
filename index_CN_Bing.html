@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+/* 基础变量结构 - 亮色模式 */
+:root {
+    /* 亮暗模式基础变量 */
+    --bg-primary: #f5f9fc;
+    --bg-secondary: #e9eff4;
+    --text-primary: #333840;
+    --text-secondary: #5d6b7b;
+    --form-bg: white;
+    --quote-shadow: rgba(0, 0, 0, 0.05);
+    
+    /* 颜色系统 - 青蓝主题（默认） */
+    --theme-light: rgb(141, 165, 177);
+    --theme-deep: rgb(89, 114, 143);
+    --theme-start: rgb(154, 167, 177);
+    --theme-continue: rgb(107, 121, 142);
+    --theme-hover: rgb(69, 94, 123);
+    
+    /* UI元素 - 使用主题变量 */
+    --form-border: rgba(107, 121, 142, 0.2);
+    --form-shadow: rgba(89, 114, 143, 0.08);
+    --button-bg: var(--theme-deep);
+    --button-hover: var(--theme-hover);
+    --icon-color: var(--theme-continue);
+    --title-gradient-start: var(--theme-deep);
+    --title-gradient-end: var(--theme-hover);
+    --focus-ring: rgba(89, 114, 143, 0.25);
+    --quote-color: rgba(89, 114, 143, 0.7);
+    
+    /* 保持兼容性 - 原变量映射到新主题变量 */
+    --songlan-light: var(--theme-light);
+    --songlan-deep: var(--theme-deep);
+    --eagle-start: var(--theme-start);
+    --eagle-continue: var(--theme-continue);
+    
+    /* 引用文本变量 - 默认为青色主题引用 */
+    --current-quote: ""青取之于蓝，而青于蓝"";
+}
+
+/* 暗色模式基础变量 */
+[data-theme="dark"] {
+    --bg-primary: #1a2330;
+    --bg-secondary: #526d9655;
+    --text-primary: #e6ebf0;
+    --text-secondary: #a7b6c7;
+    --form-bg: #26303f;
+    --quote-shadow: rgba(0, 0, 0, 0.15);
+    
+    /* 颜色系统 - 青蓝暗色主题 */
+    --theme-light: rgb(111, 135, 147);
+    --theme-deep: rgb(99, 124, 153);
+    --theme-start: rgb(134, 147, 157);
+    --theme-continue: rgb(117, 131, 152);
+    --theme-hover: rgb(109, 134, 163);
+    
+    /* UI元素 - 暗色模式专用覆盖 */
+    --form-border: rgba(127, 141, 162, 0.3);
+    --form-shadow: rgba(0, 0, 0, 0.25);
+    --focus-ring: rgba(129, 154, 183, 0.4);
+    --quote-color: rgba(159, 184, 213, 0.7);
+    
+    /* 保持兼容性 */
+    --songlan-light: var(--theme-light);
+    --songlan-deep: var(--theme-deep);
+    --eagle-start: var(--theme-start);
+    --eagle-continue: var(--theme-continue);
+}
+/* —— 日落主题 Sunset —— */
+[data-color="sunset"] {
+    /* 亮色模式 */
+    --theme-light: rgba(249, 226, 210, 1);     /* 奶油粉橘 */
+    --theme-deep:  rgba(236, 143, 106, 1);     /* 烟熏橘红 */
+    --theme-start: rgba(255, 232, 182, 1);     /* 柔金色 */
+    --theme-continue: rgba(247, 176, 136, 1);  /* 浅珊瑚 */
+    --theme-hover: rgba(212, 121, 96, 1);      /* 低饱和砖橘 */
+  
+    --form-border: rgba(224, 92, 77, 0.2);
+    --form-shadow: rgba(255, 111, 89, 0.08);
+    --focus-ring: rgba(224, 92, 77, 0.25);
+    --quote-color: rgba(224, 92, 77, 0.7);
+}
+
+[data-theme="dark"][data-color="sunset"] {
+    --theme-light: rgba(187, 134, 116, 1);     /* 柔雾粉棕 */
+    --theme-deep:  rgba(168, 86, 74, 1);       /* 烟玫砖红 */
+    --theme-start: rgba(224, 168, 92, 1);      /* 琥珀暖金 */
+    --theme-continue: rgba(191, 109, 90, 1);   /* 焦糖橘粉 */
+    --theme-hover: rgba(140, 65, 54, 1);       /* 烟熏红棕 */
+
+    --form-border: rgba(191, 109, 90, 0.25);   /* 与continue匹配 */
+    --form-shadow: rgba(0, 0, 0, 0.2);
+    --focus-ring: rgba(224, 168, 92, 0.3);     /* amber光晕 */
+    --quote-color: rgba(224, 168, 92, 0.6);    /* 柔光金橘引用 */
+}
+
+/* 紫磨金主题 - 亮色模式 */
+[data-color="zimojin"] {
+    --theme-light: rgb(210, 175, 157);
+    --theme-deep: rgb(188, 131, 107);
+    --theme-start: rgb(210, 175, 157);
+    --theme-continue: rgb(188, 131, 107);
+    --theme-hover: rgb(168, 111, 87);
+    
+    /* 紫磨金主题专用UI元素颜色 */
+    --form-border: rgba(188, 131, 107, 0.2);
+    --form-shadow: rgba(188, 131, 107, 0.08);
+    --focus-ring: rgba(188, 131, 107, 0.25);
+    --quote-color: rgba(188, 131, 107, 0.7);
+}
+
+/* 紫磨金主题 - 暗色模式 */
+[data-theme="dark"][data-color="zimojin"] {
+    --theme-light: rgb(190, 155, 137);
+    --theme-deep: rgb(168, 121, 97);
+    --theme-start: rgb(190, 155, 137);
+    --theme-continue: rgb(168, 121, 97);
+    --theme-hover: rgb(148, 101, 77);
+    
+    /* 紫磨金暗色主题专用UI元素颜色 */
+    --form-border: rgba(168, 121, 97, 0.3);
+    --form-shadow: rgba(0, 0, 0, 0.25);
+    --focus-ring: rgba(168, 121, 97, 0.4);
+    --quote-color: rgba(168, 121, 97, 0.7);
+}
+
+/* 桃夭主题 - 亮色模式 */
+[data-color="taoyao"] {
+    --theme-light: rgb(246, 190, 200);
+    --theme-deep: rgb(240, 145, 160);
+    --theme-start: rgb(246, 190, 200);
+    --theme-continue: rgb(240, 145, 160);
+    --theme-hover: rgb(220, 125, 140);
+    
+    /* 桃夭主题专用UI元素颜色 */
+    --form-border: rgba(240, 145, 160, 0.2);
+    --form-shadow: rgba(240, 145, 160, 0.08);
+    --focus-ring: rgba(240, 145, 160, 0.25);
+    --quote-color: rgba(240, 145, 160, 0.7);
+}
+
+/* 桃夭主题 - 暗色模式 */
+[data-theme="dark"][data-color="taoyao"] {
+    --theme-light: rgb(226, 170, 180);
+    --theme-deep: rgb(220, 135, 150);
+    --theme-start: rgb(226, 170, 180);
+    --theme-continue: rgb(220, 135, 150);
+    --theme-hover: rgb(200, 125, 140);
+    
+    /* 桃夭暗色主题专用UI元素颜色 */
+    --form-border: rgba(220, 135, 150, 0.3);
+    --form-shadow: rgba(0, 0, 0, 0.25);
+    --focus-ring: rgba(220, 135, 150, 0.4);
+    --quote-color: rgba(220, 135, 150, 0.7);
+}
+
+/* —— 森林主题 Forest —— */
+[data-color="forest"] {
+    /* 亮色模式 */
+    --theme-light: #a3bfa8;      /* 青松嫩叶 */
+    --theme-deep:  #5f8d4e;      /* 古松深绿 */
+    --theme-start: #8ebf9e;      /* 浅绿点缀 */
+    --theme-continue:#6ca267;    /* 中调绿 */
+    --theme-hover: #4a7540;      /* 悬停深绿 */
+  
+    /* UI 元素专项 */
+    --form-border: rgba(76, 117, 64, 0.2);
+    --form-shadow: rgba(92, 141, 89, 0.08);
+    --focus-ring: rgba(76, 117, 64, 0.25);
+    --quote-color: rgba(76, 117, 64, 0.7);
+}
+[data-theme="dark"][data-color="forest"] {
+    /* 暗色模式 */
+    --theme-light: #7a8f7d;
+    --theme-deep:  #4a5e44;
+    --theme-start: #8ca38e;
+    --theme-continue:#6e8565;
+    --theme-hover: #5a6c4f;
+  
+    --form-border: rgba(106, 126, 102, 0.3);
+    --form-shadow: rgba(0, 0, 0, 0.25);
+    --focus-ring: rgba(106, 126, 102, 0.4);
+    --quote-color: rgba(158, 184, 172, 0.7);
+}
+
+/* —— 极夜主题 Polar Night —— */
+[data-color="polar"] {
+    /* 亮色模式 */
+    --theme-light: #cad2c5;      /* 冰川灰绿 */
+    --theme-deep:  #84a59d;      /* 极夜青灰 */
+    --theme-start: #a5c9ca;      /* 雾色青 */
+    --theme-continue:#6b8e8e;    /* 深雾青 */
+    --theme-hover: #4b6f6f;      /* 极夜深色 */
+  
+    --form-border: rgba(75, 111, 111, 0.2);
+    --form-shadow: rgba(132, 165, 157, 0.08);
+    --focus-ring: rgba(75, 111, 111, 0.25);
+    --quote-color: rgba(75, 111, 111, 0.7);
+}
+[data-theme="dark"][data-color="polar"] {
+    /* 暗色模式 */
+    --theme-light: #98afa8;
+    --theme-deep:  #5d7b79;
+    --theme-start: #8aa3a3;
+    --theme-continue:#57706f;
+    --theme-hover: #3d5656;
+  
+    --form-border: rgba(61, 86, 86, 0.3);
+    --form-shadow: rgba(0, 0, 0, 0.25);
+    --focus-ring: rgba(61, 86, 86, 0.4);
+    --quote-color: rgba(118, 150, 150, 0.7);
+}
+
+/* —— 海洋主题 Ocean —— */
+[data-color="ocean"]{
+    /* 亮色模式 Light Mode */
+    --theme-light: #e0f7fa;      /* 浅天蓝 Light Sky Blue */
+    --theme-deep:  #6E9BC5;      /* 挼蓝 */
+    --theme-start: #fff3e0;      /* 沙滩米白 Sandy Beige */
+    --theme-continue:#1d3557;    /* 船舷蓝 */
+    --theme-hover: #01579b;      /* 更深的海蓝 Darker Sea Blue */
+
+    /* UI 元素专项 UI Elements */
+    --form-border: rgba(2, 119, 189, 0.2);  /* Based on --theme-deep */
+    --form-shadow: rgba(128, 222, 234, 0.1); /* Lighter accent shadow */
+    --focus-ring: rgba(2, 119, 189, 0.25); /* Based on --theme-deep */
+    --quote-color: rgba(2, 119, 189, 0.7);  /* Based on --theme-deep */
+}
+[data-theme="dark"][data-color="ocean"] {
+    --theme-light: #a8dadc;      /* 海洋浅蓝 */
+    --theme-deep:  #457b9d;      /* 深海蓝 */
+    --theme-start: #89c2d9;      /* 天空蓝 */
+    --theme-continue:#396cb3;    /* 船舷蓝 */
+    --theme-hover: #1b4f72;      /* 海面深蓝 */
+  
+    --form-border: rgba(29, 77, 114, 0.2);
+    --form-shadow: rgba(69, 123, 157, 0.08);
+    --focus-ring: rgba(29, 77, 114, 0.25);
+    --quote-color: rgba(29, 77, 114, 0.7);
+}
+
+/* 自适应扩展的主题控制容器 */
+.theme-controls {
+    position: absolute;
+    top: 35vh;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+    
+    /* 高通透轻磨砂效果 */
+    padding: 15px 10px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    
+    /* 关键：添加过渡效果 */
+    transition: all 0.3s ease, padding 0.3s ease;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .theme-controls {
+        background: rgba(20, 20, 20, 0.15);
+    }
+}
+
+/* 颜色主题选择器容器 */
+.color-theme-dropdown {
+    position: relative;
+    /* 确保整个下拉区域都在容器内 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 当前主题按钮 */
+.current-theme {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--theme-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px var(--form-shadow);
+    transition: all 0.3s ease;
+    border: 2px solid var(--bg-secondary);
+    position: relative;
+    z-index: 5;
+}
+
+.current-theme:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--form-shadow);
+}
+
+.dropdown-separator {
+    height: 1px;
+    background-color: #e0e0e0be; /* 浅灰色分隔线，可以根据主题调整颜色 */
+    margin: 5px 0;             /* 上下边距 */
+    width: 90%;                /* 宽度稍小于容器宽度 */
+    margin-left: auto;
+    margin-right: auto;        /* 居中显示 */
+}
+
+/* 颜色选项菜单 - 改为容器内相对定位而非绝对定位 */
+.color-options {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* 保持单列布局 */
+    gap: 8px;
+    padding: 8px;
+    background: transparent; /* 不需要额外背景 */
+    box-shadow: none; /* 移除阴影 */
+    border-radius: 0;
+    
+    /* 关键：初始状态为高度为0，隐藏内容 */
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    
+    /* 确保不影响布局 */
+    margin: 0;
+    width: 100%;
+}
+
+/* 悬停时展开菜单 */
+.color-theme-dropdown:hover .color-options {
+    max-height: 300px; /* 足够大以显示所有选项 */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 颜色选项 */
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    font-size: 16px;
+    position: relative;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.color-option.active {
+    opacity: 1;
+    box-shadow: 0 0 0 2px var(--theme-deep);
+}
+
+
+/* 颜色示例 - 按色轮顺序排列 */
+/* 1. 日落主题 - 橙红色系 */
+.color-option[data-color="sunset"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color:  rgba(236, 143, 106, 1); /* 烟熏橘红 */
+}
+
+/* 2. 紫磨金主题 - 金棕色系 */
+.color-option[data-color="zimojin"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgb(188, 131, 107); /* 紫磨金 */
+}
+
+/* 3. 桃夭主题 - 粉红色系 */
+.color-option[data-color="taoyao"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgb(240, 145, 160); /* 桃夭粉 */
+}
+
+/* 4. 森林主题 - 绿色系 */
+.color-option[data-color="forest"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #5f8d4e; /* 古松深绿 */
+}
+
+/* 5. 极夜主题 - 青灰色系 */
+.color-option[data-color="polar"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #84a59d; /* 极夜青灰 */
+}
+
+/* 6. 海洋主题 - 深蓝色系 */
+.color-option[data-color="ocean"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #457b9d; /* 深海蓝 */
+}
+
+/* 7. 青蓝主题(默认) - 青蓝色系 */
+.color-option[data-color="default"]::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgb(89, 114, 143); /* 青蓝色 */
+}
+
+
+
+.theme-toggle-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-secondary);
+    box-shadow: 0 2px 8px var(--form-shadow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.theme-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--form-shadow);
+}
+
+.toggle-icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.toggle-icon.auto-icon {
+    font-family: sans-serif;
+    font-weight: bold;
+    color: var(--theme-deep);
+}
+
+.toggle-icon.sun-icon {
+    color: #f39c12;
+}
+
+.toggle-icon.moon-icon {
+    color: #9b59b6;
+}
+
+.toggle-icon.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'Noto Serif SC';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/notoserifsc/v22/H4chBXePl9DZ0Xe7gG9cyOj7oqP7.otf) format('opentype');
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+}
+/* Add this to your CSS */
+@keyframes move-background {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--bg-primary);
+    background-image: 
+        radial-gradient(circle at 80% 20%, var(--theme-light), transparent 40%),
+        radial-gradient(circle at 20% 80%, var(--theme-start), transparent 50%);
+    background-size: 200% 200%;
+    background-attachment: fixed;
+    animation: move-background 30s ease infinite;
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: all 0.4s ease;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 520px;
+    padding: 22px;
+    margin: 0;
+    background-color: var(--bg-secondary);
+    background-image: 
+        linear-gradient(120deg, transparent, var(--bg-secondary), rgba(141, 165, 177, 0.1));
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    max-height: 90vh; /* Limit height to prevent overflow */
+    overflow-y: auto; /* Add scrollbar only if needed inside container */
+    position: relative;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    padding: 16px 25px;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, var(--title-gradient-start), var(--title-gradient-end));
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* Phoenix decoration for title */
+.title::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg' opacity='0.15'%3E%3Cpath d='M30,20 Q45,10 60,20 T90,40 Q70,50 90,60 T60,80 Q45,90 30,80 T10,60 Q30,50 10,40 T30,20 Z' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: contain;
+    opacity: 0.15;
+}
+
+.title:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.quote-subtle {
+    margin: -10px 0 8px;
+    text-align: center;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.quote-subtle::before,
+.quote-subtle::after {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 1px;
+    background: var(--text-secondary);
+    opacity: 0.3;
+    position: relative;
+    top: -4px;
+    margin: 0 8px;
+}
+
+form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--form-border);
+    border-radius: 10px;
+    background: var(--form-bg);
+    padding: 10px 14px;
+    box-shadow: 0 2px 6px var(--form-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Traditional pattern overlay on form */
+form::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' opacity='0.03'%3E%3Cpath d='M10,2 L18,10 L10,18 L2,10 L10,2 Z' fill='%23597290'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+form:hover {
+    border-color: var(--theme-light);
+    box-shadow: 0 4px 12px var(--form-shadow);
+    transform: translateY(-1px);
+}
+
+form:focus-within {
+    border-color: var(--theme-deep);
+    box-shadow: 0 0 0 3px var(--focus-ring), 0 4px 12px var(--form-shadow);
+}
+
+input[type="search"] {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 8px 0;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: inherit;
+    caret-color: var(--theme-deep);
+}
+
+/* For Zhihu search placeholder */
+form.ZhiHu input[name="q"] {
+    color: var(--text-secondary);
+}
+
+form.ZhiHu input[name="q"]:focus {
+    color: var(--text-primary);
+}
+
+input[type="search"]::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+button {
+    background-color: var(--button-bg);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.6s;
+    pointer-events: none;
+}
+
+button:active::after {
+    transform: scale(20);
+    opacity: 0;
+}
+
+svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+    flex-shrink: 0;
+    color: var(--icon-color);
+    transition: color 0.3s ease;
+}
+
+form:hover svg {
+    color: var(--theme-deep);
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+    .container {
+        padding: 16px;
+        gap: 12px;
+        max-width: 95%;
+        max-height: 85vh;
+    }
+    .title {
+        font-size: 22px;
+        padding: 12px 18px;
+        margin-bottom: 12px;
+    }
+    .quote-subtle {
+        font-size: 12px;
+        margin: -8px 0 5px;
+    }
+    .quote-subtle::before,
+    .quote-subtle::after {
+        width: 20px;
+        margin: 0 5px;
+    }
+    .container::before {
+        font-size: 12px;
+        bottom: 8px;
+        right: 12px;
+    }
+    form {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    input[type="search"] {
+        font-size: 15px;
+    }
+    button {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+    .theme-toggle-btn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+    }
+    .toggle-icon {
+        font-size: 15px;
+    }
+    .current-theme {
+        width: 32px;
+        height: 32px;
+    }
+    .color-option {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+}
+
+/* For very small screens */
+@media (max-height: 600px) {
+    .container {
+        gap: 10px;
+        padding: 12px;
+    }
+    .title {
+        font-size: 20px;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+    }
+    .quote-subtle {
+        margin: -5px 0 2px;
+    }
+    form {
+        padding: 6px 10px;
+    }
+}
+</style>
+</head>
+<body>
+    <!-- 主题控制区域 -->
+    <div class="theme-controls">
+        <!-- 明暗模式切换 -->
+        <div class="theme-toggle-btn" id="themeToggleBtn" title="自动跟随系统(Auto)">
+            <div class="toggle-icon auto-icon active">Auto</div>
+            <div class="toggle-icon sun-icon">☀</div>
+            <div class="toggle-icon moon-icon">🌙</div>
+        </div>
+        
+        <!-- 颜色主题选择 - 下拉式 -->
+        <div class="color-theme-dropdown" id="colorThemeDropdown">
+            <!-- 当前颜色主题显示 -->
+            <div class="current-theme" id="currentTheme"></div>
+            <!-- 颜色选项下拉菜单 - 按色轮顺序排列 -->
+            <div class="color-options">
+                <!-- 添加分隔线 -->
+                <div class="dropdown-separator"></div>
+                <div class="color-option" data-color="sunset" title="日落主题"></div>
+                <div class="color-option" data-color="zimojin" title="紫磨金主辉题"></div>
+                <div class="color-option" data-color="taoyao" title="桃夭春晓主题"></div>
+                <div class="color-option" data-color="forest" title="森林主题"></div>
+                <div class="color-option" data-color="polar" title="极夜主题"></div>
+                <div class="color-option" data-color="ocean" title="海洋主题"></div>
+                <div class="color-option active" data-color="default" title="沧蓝主题"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="title">聚合搜索</div>
+        <div class="quote-subtle">青取之于蓝，而青于蓝</div>
+
+        <!-- Bing Search -->
+        <form class="Bing" action="https://cn.bing.com/search" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><g stroke="currentColor" fill="none"><circle cx="10" cy="10" r="6.5"></circle><path d="M15.5 15.5L20 20" stroke-linecap="square"></path></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="Bing 搜索" tabindex="2">
+            <button type="submit">Bing</button>
+        </form>
+
+        <!-- Bilibili Search -->
+        <form class="Bilibili" action="https://search.bilibili.com/video" method="get">
+            <svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M6 8.5V12M6 15.5V12M6 12H10.5M10.5 12L10.5 8.5M10.5 12L10.5 15.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14 12V8.5C16.5 8.5 19 8.5 19 12C19 15.5 16.5 15.5 14 15.5V12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1 15V9C1 5.68629 3.68629 3 7 3H17C20.3137 3 23 5.68629 23 9V15C23 18.3137 20.3137 21 17 21H7C3.68629 21 1 18.3137 1 15Z" stroke="currentColor" stroke-width="1.5"></path></svg>
+            <input autocomplete="off" name="keyword" type="search" placeholder="哔哩哔哩搜索" tabindex="3">
+            <button type="submit">哔哩哔哩</button>
+        </form>
+
+        <!-- YouTube Search -->
+        <form class="YouTube" action="https://www.youtube.com/results" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M14 12L10.5 14V10L14 12Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2 12.7075V11.2924C2 8.39705 2 6.94939 2.90549 6.01792C3.81099 5.08645 5.23656 5.04613 8.08769 4.96549C9.43873 4.92728 10.8188 4.8999 12 4.8999C13.1812 4.8999 14.5613 4.92728 15.9123 4.96549C18.7634 5.04613 20.189 5.08645 21.0945 6.01792C22 6.94939 22 8.39705 22 11.2924V12.7075C22 15.6028 22 17.0505 21.0945 17.9819C20.189 18.9134 18.7635 18.9537 15.9124 19.0344C14.5613 19.0726 13.1812 19.1 12 19.1C10.8188 19.1 9.43867 19.0726 8.0876 19.0344C5.23651 18.9537 3.81097 18.9134 2.90548 17.9819C2 17.0505 2 15.6028 2 12.7075Z" stroke="currentColor" stroke-width="1.5"></path></svg>
+            <input autocomplete="off" name="search_query" type="search" placeholder="YouTube 搜索" tabindex="4">
+            <button type="submit">YouTube</button>
+        </form>
+
+        <!-- ChatGPT Search -->
+        <form class="ChatGPT" action="https://chatgpt.com/" method="get">
+            <svg width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 509.639"><path fill="currentColor" d="M115.612 0h280.775C459.974 0 512 52.026 512 115.612v278.415c0 63.587-52.026 115.613-115.613 115.613H115.612C52.026 509.64 0 457.614 0 394.027V115.612C0 52.026 52.026 0 115.612 0z" opacity="0.1"/><path fill-rule="nonzero" fill="currentColor" d="M412.037 221.764a90.834 90.834 0 004.648-28.67 90.79 90.79 0 00-12.443-45.87c-16.37-28.496-46.738-46.089-79.605-46.089-6.466 0-12.943.683-19.264 2.04a90.765 90.765 0 00-67.881-30.515h-.576c-.059.002-.149.002-.216.002-39.807 0-75.108 25.686-87.346 63.554-25.626 5.239-47.748 21.31-60.682 44.03a91.873 91.873 0 00-12.407 46.077 91.833 91.833 0 0023.694 61.553 90.802 90.802 0 00-4.649 28.67 90.804 90.804 0 0012.442 45.87c16.369 28.504 46.74 46.087 79.61 46.087a91.81 91.81 0 0019.253-2.04 90.783 90.783 0 0067.887 30.516h.576l.234-.001c39.829 0 75.119-25.686 87.357-63.588 25.626-5.242 47.748-21.312 60.682-44.033a91.718 91.718 0 0012.383-46.035 91.83 91.83 0 00-23.693-61.553l-.004-.005zM275.102 413.161h-.094a68.146 68.146 0 01-43.611-15.8 56.936 56.936 0 002.155-1.221l72.54-41.901a11.799 11.799 0 005.962-10.251V241.651l30.661 17.704c.326.163.55.479.596.84v84.693c-.042 37.653-30.554 68.198-68.21 68.273h.001zm-146.689-62.649a68.128 68.128 0 01-9.152-34.085c0-3.904.341-7.817 1.005-11.663.539.323 1.48.897 2.155 1.285l72.54 41.901a11.832 11.832 0 0011.918-.002l88.563-51.137v35.408a1.1 1.1 0 01-.438.94l-73.33 42.339a68.43 68.43 0 01-34.11 9.12 68.359 68.359 0 01-59.15-34.11l-.001.004zm-19.083-158.36a68.044 68.044 0 0135.538-29.934c0 .625-.036 1.731-.036 2.5v83.801l-.001.07a11.79 11.79 0 005.954 10.242l88.564 51.13-30.661 17.704a1.096 1.096 0 01-1.034.093l-73.337-42.375a68.36 68.36 0 01-34.095-59.143 68.412 68.412 0 019.112-34.085l-.004-.003zm251.907 58.621l-88.563-51.137 30.661-17.697a1.097 1.097 0 011.034-.094l73.337 42.339c21.109 12.195 34.132 34.746 34.132 59.132 0 28.604-17.849 54.199-44.686 64.078v-86.308c.004-.032.004-.065.004-.096 0-4.219-2.261-8.119-5.919-10.217zm30.518-45.93c-.539-.331-1.48-.898-2.155-1.286l-72.54-41.901a11.842 11.842 0 00-5.958-1.611c-2.092 0-4.15.558-5.957 1.611l-88.564 51.137v-35.408l-.001-.061a1.1 1.1 0 01.44-.88l73.33-42.303a68.301 68.301 0 0134.108-9.129c37.704 0 68.281 30.577 68.281 68.281a68.69 68.69 0 01-.984 11.545v.005zm-191.843 63.109l-30.668-17.704a1.09 1.09 0 01-.596-.84v-84.692c.016-37.685 30.593-68.236 68.281-68.236a68.332 68.332 0 0143.689 15.804 63.09 63.09 0 00-2.155 1.222l-72.54 41.9a11.794 11.794 0 00-5.961 10.248v.068l-.05 102.23zm16.655-35.91l39.445-22.782 39.444 22.767v45.55l-39.444 22.767-39.445-22.767v-45.535z"/></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="ChatGPT 搜索" tabindex="1">
+            <button type="submit">ChatGPT</button>
+        </form>
+
+        <!-- Zhihu Search - Updated URL -->
+        <form class="ZhiHu" action="https://zhida.zhihu.com/search" method="get">
+            <svg width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M4 21.4V2.6C4 2.26863 4.26863 2 4.6 2H16.2515C16.4106 2 16.5632 2.06321 16.6757 2.17574L19.8243 5.32426C19.9368 5.43679 20 5.5894 20 5.74853V21.4C20 21.7314 19.7314 22 19.4 22H4.6C4.26863 22 4 21.7314 4 21.4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 10L16 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 18L16 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M8 14L12 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16 2V5.4C16 5.73137 16.2686 6 16.6 6H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="知乎搜索" tabindex="5">
+            <button type="submit">知乎</button>
+        </form>
+
+        <!-- Zlibrary Search -->
+        <form class="zlibrary" action="https://zh.1lib.sk/s/" method="get">
+            <svg width="24px" stroke-width="1.5" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M4 19V5C4 3.89543 4.89543 3 6 3H19.4C19.7314 3 20 3.26863 20 3.6V16.7143" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><path d="M8 3V11L10.5 9.4L13 11V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6 17L20 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><path d="M6 21L20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path><path d="M6 21C4.89543 21 4 20.1046 4 19C4 17.8954 4.89543 17 6 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="q" type="search" placeholder="Z-Library 图书搜索" tabindex="6">
+            <button type="submit">Z-Library</button>
+        </form>
+
+        <!-- Wikipedia CN Search -->
+        <form class="Wikipedia" action="https://zh.wikipedia.org/wiki/Special:Search" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 12.5L8 14.5L7 18L8 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 20.5L16.5 18L14 17V13.5L17 12.5L21.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5.5L18.5 7L15 7.5V10.5L17.5 9.5H19.5L21.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 10.5L5 8.5L7.5 8L9.5 5L8.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="search" type="search" placeholder="维基百科搜索 (中文)" tabindex="7">
+            <button type="submit">维基百科中文</button>
+        </form>
+
+        <!-- Wikipedia EN Search -->
+        <form class="Wikipedia" action="https://en.wikipedia.org/wiki/Special:Search" method="get">
+            <svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 12.5L8 14.5L7 18L8 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 20.5L16.5 18L14 17V13.5L17 12.5L21.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5.5L18.5 7L15 7.5V10.5L17.5 9.5H19.5L21.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2.5 10.5L5 8.5L7.5 8L9.5 5L8.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <input autocomplete="off" name="search" type="search" placeholder="维基百科搜索 (英文)" tabindex="8">
+            <button type="submit">维基百科英文</button>
+        </form>
+    </div>
+
+    <script>
+// 主题切换器
+const themeSystem = {
+    // 主题模式存储键
+    modeStorageKey: 'themeMode',
+    colorStorageKey: 'themeColor',
+    
+    // 主题颜色映射 - 按色轮顺序排列（暖色到冷色）
+    themeColors: {
+        'sunset': {
+            color: 'rgba(236, 143, 106, 1)',// 烟熏橘红 //
+            displayName: '日落',
+            quote: '落霞与孤鹜齐飞，秋水共长天一色'  // 日落主题引用
+        },
+        'zimojin': {
+            color: 'rgb(188, 131, 107)', // 紫磨金色
+            displayName: '紫磨金',
+            quote: '碧琉璃色水澄清，紫磨金光身莹明' // 紫磨金主题引用
+        },
+        'songhua': {
+            color: 'rgb(255, 238, 111)', // 松花色
+            displayName: '松花',
+            quote: '金银气色，若白轻黄' // 松花主题引用
+        },
+        'taoyao': {
+            color: 'rgb(240, 145, 160)', // 桃夭色
+            displayName: '桃夭',
+            quote: '桃之夭夭，灼灼其华' // 桃夭主题引用
+        },
+        'forest': {
+            color: 'rgb(95, 141, 78)',       // 森林深绿 (theme-deep)
+            displayName: '森林',
+            quote: '林深时见鹿'             // 森林主题引用
+        },
+        'polar': {
+            color: 'rgb(132, 165, 157)',     // 极夜青灰 (theme-deep)
+            displayName: '极夜',
+            quote: '极夜寂静，北辰闪烁'     // 极夜主题引用
+        },
+        'ocean': {
+            color: 'rgb(69, 123, 157)',      // 深海蓝 (theme-deep)
+            displayName: '海洋',
+            quote: '海阔凭鱼跃，天高任鸟飞'  // 海洋主题引用
+        },
+        'default': {
+            color: 'rgb(89, 114, 143)', // 青蓝色
+            displayName: '青蓝',
+            quote: '青取之于蓝，而青于蓝' // 默认青色主题引用
+        }
+    },
+    
+    // 当前设置
+    currentMode: 'auto',
+    currentColor: 'default',
+    
+    // 初始化
+    init: function() {
+        // 亮暗模式切换
+        this.initThemeToggle();
+        
+        // 颜色主题切换
+        this.initColorTheme();
+    },
+    
+    // 初始化亮暗模式切换
+    initThemeToggle: function() {
+        const toggleBtn = document.getElementById('themeToggleBtn');
+        const autoIcon = toggleBtn.querySelector('.auto-icon');
+        const sunIcon = toggleBtn.querySelector('.sun-icon');
+        const moonIcon = toggleBtn.querySelector('.moon-icon');
+        
+        // 加载保存的亮暗模式
+        const savedMode = localStorage.getItem(this.modeStorageKey);
+        if (savedMode && ['auto', 'light', 'dark'].includes(savedMode)) {
+            this.currentMode = savedMode;
+            
+            // 更新按钮状态
+            autoIcon.classList.remove('active');
+            sunIcon.classList.remove('active');
+            moonIcon.classList.remove('active');
+            
+            if (this.currentMode === 'auto') {
+                autoIcon.classList.add('active');
+                toggleBtn.title = '自动跟随系统(Auto)';
+            }
+            else if (this.currentMode === 'light') {
+                sunIcon.classList.add('active');
+                toggleBtn.title = '亮色模式(Light)';
+            }
+            else {
+                moonIcon.classList.add('active');
+                toggleBtn.title = '暗色模式(Dark)';
+            }
+        }
+        
+        // 绑定事件
+        toggleBtn.addEventListener('click', () => {
+            // 按顺序切换: auto -> light -> dark -> auto
+            if (this.currentMode === 'auto') {
+                this.currentMode = 'light';
+                toggleBtn.title = '亮色模式(Light)';
+            }
+            else if (this.currentMode === 'light') {
+                this.currentMode = 'dark';
+                toggleBtn.title = '暗色模式(Dark)';
+            }
+            else {
+                this.currentMode = 'auto';
+                toggleBtn.title = '自动跟随系统(Auto)';
+            }
+            
+            // 保存选择
+            localStorage.setItem(this.modeStorageKey, this.currentMode);
+            
+            // 更新按钮状态
+            autoIcon.classList.remove('active');
+            sunIcon.classList.remove('active');
+            moonIcon.classList.remove('active');
+            
+            if (this.currentMode === 'auto') autoIcon.classList.add('active');
+            else if (this.currentMode === 'light') sunIcon.classList.add('active');
+            else moonIcon.classList.add('active');
+            
+            // 应用主题
+            this.applyTheme();
+        });
+        
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (this.currentMode === 'auto') {
+                this.applyTheme();
+            }
+        });
+    },
+    
+    // 初始化颜色主题切换
+    initColorTheme: function() {
+        const colorOptions = document.querySelectorAll('.color-option');
+        const currentTheme = document.getElementById('currentTheme');
+        
+        // 加载保存的颜色主题
+        const savedColor = localStorage.getItem(this.colorStorageKey);
+        if (savedColor && this.themeColors[savedColor]) {
+            this.currentColor = savedColor;
+        }
+        
+        // 更新选择状态和当前主题显示
+        this.updateColorSelection();
+        
+        // 绑定事件
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // 设置新的颜色主题
+                this.currentColor = option.dataset.color;
+                
+                // 保存选择
+                localStorage.setItem(this.colorStorageKey, this.currentColor);
+                
+                // 更新选择状态和当前主题显示
+                this.updateColorSelection();
+                
+                // 应用主题
+                this.applyTheme();
+            });
+        });
+        
+        // 初始应用主题引用
+        this.updateThemeQuote();
+    },
+    
+    // 更新颜色选择状态和当前主题显示
+    updateColorSelection: function() {
+        const colorOptions = document.querySelectorAll('.color-option');
+        const currentTheme = document.getElementById('currentTheme');
+        
+        // 更新选项选中状态
+        colorOptions.forEach(option => {
+            option.classList.remove('active');
+            if (option.dataset.color === this.currentColor) {
+                option.classList.add('active');
+            }
+        });
+        
+        // 更新当前主题显示
+        const themeColor = this.themeColors[this.currentColor].color;
+        currentTheme.style.backgroundColor = themeColor;
+        
+        // 设置提示文本
+        currentTheme.title = this.themeColors[this.currentColor].displayName + '主题';
+    },
+    
+    // 更新主题引用文本
+    updateThemeQuote: function() {
+        const quoteElement = document.querySelector('.quote-subtle');
+        if (quoteElement) {
+            // 获取当前主题的引用文本
+            const quote = this.themeColors[this.currentColor].quote;
+            quoteElement.textContent = quote;
+        }
+    },
+    
+    // 应用主题
+    applyTheme: function() {
+        // 确定亮暗模式
+        let theme;
+        if (this.currentMode === 'auto') {
+            // 自动模式下跟随系统设置
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDarkMode ? 'dark' : 'light';
+        } else {
+            // 手动模式使用选定的主题
+            theme = this.currentMode;
+        }
+        
+        // 应用亮暗模式到文档
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // 应用颜色主题到文档
+        if (this.currentColor === 'default') {
+            document.documentElement.removeAttribute('data-color');
+        } else {
+            document.documentElement.setAttribute('data-color', this.currentColor);
+        }
+        
+        // 更新主题引用文本
+        this.updateThemeQuote();
+    }
+};
+
+// 文档加载完成后初始化主题系统
+document.addEventListener('DOMContentLoaded', () => {
+    themeSystem.init();
+    themeSystem.applyTheme();
+});
+</script>
+</body>
+</html>
